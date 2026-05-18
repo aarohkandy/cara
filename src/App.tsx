@@ -169,26 +169,15 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
   return (
     <main className="landing">
       <BackgroundMotion />
-      <div className="landing-drafting-frame" aria-hidden="true">
-        <span className="draft-ruler draft-ruler-x" />
-        <span className="draft-ruler draft-ruler-y" />
-        <span className="draft-corner draft-corner-a" />
-        <span className="draft-corner draft-corner-b" />
-        <span className="draft-corner draft-corner-c" />
-        <span className="draft-corner draft-corner-d" />
-      </div>
-      <div className="landing-motion-rig" aria-hidden="true">
-        <span className="rig-orbit" />
-        <span className="rig-orbit rig-orbit-alt" />
-        <span className="rig-caliper rig-caliper-left" />
-        <span className="rig-caliper rig-caliper-right" />
-        <span className="rig-part rig-part-a" />
-        <span className="rig-part rig-part-b" />
-        <span className="rig-part rig-part-c" />
-        <span className="rig-node rig-node-a" />
-        <span className="rig-node rig-node-b" />
-        <span className="rig-node rig-node-c" />
-        <span className="rig-scan" />
+      <div className="landing-stage" aria-hidden="true">
+        <span className="stage-ring stage-ring-outer" />
+        <span className="stage-ring stage-ring-inner" />
+        <span className="stage-axis stage-axis-x" />
+        <span className="stage-axis stage-axis-y" />
+        <span className="stage-part stage-part-base" />
+        <span className="stage-part stage-part-jaw" />
+        <span className="stage-part stage-part-pin" />
+        <span className="stage-cursor" />
       </div>
       <header className="landing-nav">
         <div className="brand-lockup">
@@ -204,41 +193,19 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
       <section className="landing-content">
         <div className="hero-copy">
           <h1>Cadybara</h1>
-          <div className="hero-system">
-            <div className="hero-command" aria-label="Example CAD prompt">
-              <span>Speak</span>
-              <strong>make a clamp bracket with indexed service tabs</strong>
-              <i />
-            </div>
-            <div className="hero-matrix" aria-label="Workspace pipeline">
-              <span>
-                <b>Kernel</b>
-                solid draft
-              </span>
-              <span>
-                <b>Check</b>
-                wall + tabs
-              </span>
-              <span>
-                <b>State</b>
-                resolving
-              </span>
-              <span>
-                <b>Output</b>
-                STEP package
-              </span>
-            </div>
-            <div className="hero-feed" aria-label="Build trace">
-              <span>prompt parsed</span>
-              <span>edges tagged</span>
-              <span>drawing queued</span>
-            </div>
+          <div className="hero-command" aria-label="Example CAD prompt">
+            <span>Live prompt</span>
+            <strong>clamp bracket with indexed service tabs</strong>
+            <i />
+          </div>
+          <div className="hero-activity" aria-label="Build activity">
+            <span>Parsing</span>
+            <span>Sketching</span>
+            <span>Solidifying</span>
           </div>
         </div>
 
         <form className="signin-panel" onSubmit={submit}>
-          <span className="panel-rivet panel-rivet-a" />
-          <span className="panel-rivet panel-rivet-b" />
           <h2>Sign in</h2>
           <label>
             <span>Email</span>
@@ -250,13 +217,6 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
           </button>
         </form>
       </section>
-
-      <div className="landing-status-rail" aria-hidden="true">
-        <span>prompt intake</span>
-        <span>solid kernel</span>
-        <span>constraint pass</span>
-        <span>export package</span>
-      </div>
     </main>
   );
 }
