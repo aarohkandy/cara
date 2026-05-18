@@ -186,11 +186,12 @@ button {
   white-space: nowrap;
 }
 
-.founders-badge img {
+.founders-mark {
   width: 31px;
   height: 31px;
   flex: 0 0 auto;
-  object-fit: contain;
+  color: var(--text);
+  fill: currentColor;
 }
 
 .landing-motion-rig {
@@ -1416,7 +1417,7 @@ button {
     white-space: nowrap;
   }
 
-  .founders-badge img {
+  .founders-mark {
     width: 28px;
     height: 28px;
   }

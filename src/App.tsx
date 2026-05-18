@@ -183,7 +183,7 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
           <strong>Cadybara</strong>
         </div>
         <div className="founders-badge">
-          <img src="/founders-inc-logo.svg" alt="" />
+          <FoundersLogo />
           <span>Backed by Founders Inc.</span>
         </div>
       </header>
@@ -206,6 +206,21 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
         </form>
       </section>
     </main>
+  );
+}
+
+function FoundersLogo() {
+  return (
+    <svg
+      className="founders-mark"
+      viewBox="0 0 128 128"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M48.6 31.1 95.1 4.3c4.1-2.4 9.2.6 9.2 5.4v17.1c0 3.2-1.7 6.1-4.5 7.7L53.3 61.2a7.3 7.3 0 0 1-7.3 0L33.3 54c-4.8-2.7-4.8-9.6 0-12.4l15.3-10.5Z" />
+      <path d="M29.5 72.7 96.2 34c4.1-2.4 9.2.6 9.2 5.3v16.8c0 3.2-1.7 6.2-4.5 7.8L43.7 97c-2.2 1.3-5 1.3-7.3 0L16.1 85.3c-4.8-2.8-4.8-9.7 0-12.5l13.4-7.8Z" />
+      <path d="M78.6 74.4 111.8 55c4.1-2.4 9.2.6 9.2 5.3v40.2c0 5.6-6.1 9-10.9 6.2L78.4 88.1c-5.3-3.1-5.2-10.6.2-13.7Z" />
+    </svg>
   );
 }
 
