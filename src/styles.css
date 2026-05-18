@@ -82,7 +82,7 @@ button {
 }
 
 .landing::after {
-  content: "";
+  content: none;
   position: absolute;
   z-index: 1;
   top: 92px;
@@ -91,6 +91,99 @@ button {
   left: 34px;
   border: 1px solid rgba(224, 197, 159, 0.08);
   pointer-events: none;
+}
+
+.landing-bay {
+  position: relative;
+  z-index: 3;
+  height: calc(100dvh - 82px);
+  min-height: 440px;
+  padding: clamp(18px, 2.6vw, 34px);
+  display: flex;
+  align-items: center;
+}
+
+.bay-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(224, 197, 159, 0.18);
+  border-radius: 8px;
+  background: rgba(13, 9, 6, 0.68);
+}
+
+.bay-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image:
+    linear-gradient(rgba(224, 197, 159, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 197, 159, 0.042) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(90deg, #000 0 72%, transparent 100%);
+  pointer-events: none;
+}
+
+.bay-stage::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 24px;
+  right: 24px;
+  bottom: 24px;
+  left: 24px;
+  border: 1px solid rgba(224, 197, 159, 0.1);
+  pointer-events: none;
+}
+
+.bay-title {
+  position: absolute;
+  z-index: 5;
+  left: clamp(24px, 4vw, 54px);
+  bottom: clamp(92px, 15vh, 150px);
+  max-width: min(55vw, 690px);
+}
+
+.bay-title span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.bay-title h1 {
+  margin: 0;
+  font-family: Newsreader, Georgia, serif;
+  font-size: clamp(72px, 10vw, 166px);
+  line-height: 0.78;
+  white-space: nowrap;
+}
+
+.bay-status {
+  position: absolute;
+  z-index: 5;
+  left: clamp(24px, 4vw, 54px);
+  bottom: clamp(28px, 5vh, 48px);
+  display: flex;
+  gap: 8px;
+}
+
+.bay-status span {
+  min-width: 82px;
+  padding: 9px 12px;
+  border: 1px solid rgba(224, 197, 159, 0.18);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.34);
+  color: #eadcc8;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .motion-field {
@@ -209,11 +302,8 @@ button {
 .landing-showpiece {
   position: absolute;
   z-index: 2;
-  top: 70px;
-  right: 29vw;
-  bottom: 42px;
-  left: 12vw;
-  min-width: 420px;
+  inset: 0 25% 0 17%;
+  min-width: 0;
   opacity: 0.98;
   pointer-events: none;
 }
@@ -910,14 +1000,18 @@ button {
 }
 
 .signin-panel {
-  position: relative;
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  right: clamp(24px, 3.4vw, 48px);
   min-width: 0;
-  align-self: center;
+  width: min(360px, calc(100% - 48px));
   padding: 24px;
   border: 1px solid rgba(224, 197, 159, 0.28);
   border-radius: 8px;
   background: rgba(13, 9, 6, 0.7);
   backdrop-filter: blur(10px);
+  transform: translateY(-50%);
 }
 
 .signin-panel::before {
@@ -1913,9 +2007,8 @@ button {
 
 @media (max-width: 1020px) {
   .landing-showpiece {
-    right: 24vw;
-    left: 10vw;
-    min-width: 360px;
+    inset: 0 25% 0 8%;
+    min-width: 0;
   }
 
   .landing-content {
@@ -1954,6 +2047,42 @@ button {
     padding: 18px 16px 0;
   }
 
+  .landing-bay {
+    align-items: flex-start;
+    min-height: auto;
+    padding: 18px 12px 96px;
+  }
+
+  .bay-stage {
+    min-height: 710px;
+  }
+
+  .bay-title {
+    top: 42px;
+    bottom: auto;
+    left: 24px;
+    max-width: calc(100% - 48px);
+  }
+
+  .bay-title h1 {
+    font-size: clamp(56px, 13vw, 92px);
+  }
+
+  .bay-status {
+    top: 154px;
+    bottom: auto;
+    left: 24px;
+  }
+
+  .signin-panel {
+    top: auto;
+    right: 20px;
+    bottom: 20px;
+    left: 20px;
+    width: auto;
+    transform: none;
+  }
+
   .founders-badge {
     min-height: 44px;
     padding: 0 14px;
@@ -1975,12 +2104,9 @@ button {
   }
 
   .landing-showpiece {
-    top: 78px;
-    right: -2vw;
-    bottom: 255px;
-    left: 28vw;
-    min-width: 340px;
-    opacity: 0.58;
+    inset: 80px -6vw 210px 16vw;
+    min-width: 0;
+    opacity: 0.72;
   }
 
   .landing-drafting-frame {
@@ -2134,12 +2260,38 @@ button {
   }
 
   .landing-showpiece {
-    top: 84px;
-    right: -34vw;
-    bottom: 310px;
-    left: 16vw;
-    min-width: 300px;
-    opacity: 0.42;
+    inset: 96px -58vw 230px -3vw;
+    min-width: 0;
+    opacity: 0.62;
+  }
+
+  .bay-stage {
+    min-height: 650px;
+  }
+
+  .bay-title {
+    top: 38px;
+    left: 18px;
+  }
+
+  .bay-title span {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  .bay-title h1 {
+    font-size: clamp(48px, 15vw, 68px);
+  }
+
+  .bay-status {
+    display: none;
+  }
+
+  .signin-panel {
+    right: 14px;
+    bottom: 14px;
+    left: 14px;
+    padding: 22px;
   }
 
   .hero-copy h1 {

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { CSSProperties, FormEvent } from "react";
+import type { FormEvent } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -171,7 +171,6 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
   return (
     <main className="landing">
       <BackgroundMotion />
-      <LandingShowpiece />
       <header className="landing-nav">
         <div className="brand-lockup">
           <img className="brand-mark" src="/cadybara-logo.svg" alt="" />
@@ -183,32 +182,30 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
         </div>
       </header>
 
-      <section className="landing-content">
-        <div className="hero-copy">
-          <h1 className="hero-wordmark" aria-label="Cadybara">
-            {"Cadybara".split("").map((letter, index) => (
-              <span
-                style={{ "--letter-index": index } as CSSProperties}
-                aria-hidden="true"
-                key={`${letter}-${index}`}
-              >
-                {letter}
-              </span>
-            ))}
-          </h1>
+      <section className="landing-bay">
+        <div className="bay-stage">
+          <LandingShowpiece />
+          <div className="bay-title">
+            <span>Generative CAD</span>
+            <h1>Cadybara</h1>
+          </div>
+          <div className="bay-status" aria-hidden="true">
+            <span>Prompt</span>
+            <span>Model</span>
+            <span>Export</span>
+          </div>
+          <form className="signin-panel" onSubmit={submit}>
+            <h2>Sign in</h2>
+            <label>
+              <span>Email</span>
+              <input value={email} onChange={(event) => setEmail(event.target.value)} />
+            </label>
+            <button className="wide-action" type="submit">
+              Launch workspace
+              <ArrowRight size={18} />
+            </button>
+          </form>
         </div>
-
-        <form className="signin-panel" onSubmit={submit}>
-          <h2>Sign in</h2>
-          <label>
-            <span>Email</span>
-            <input value={email} onChange={(event) => setEmail(event.target.value)} />
-          </label>
-          <button className="wide-action" type="submit">
-            Launch workspace
-            <ArrowRight size={18} />
-          </button>
-        </form>
       </section>
     </main>
   );
