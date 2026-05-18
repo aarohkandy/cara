@@ -114,7 +114,7 @@ function makeProjectModel(project: Project, showEdges: boolean) {
     pushMesh(lower);
   }
 
-  if (!["snowman", "propeller", "funnel", "hinge"].includes(project.id)) {
+  if (!project.isBlank && !["snowman", "propeller", "funnel", "hinge"].includes(project.id)) {
     const base = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.18, 0.86), material);
     base.position.y = -0.16;
     pushMesh(base);
@@ -185,8 +185,7 @@ export default function CadScene({
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = hero ? 1.75 : 0.65;
+    controls.autoRotate = false;
     controls.enablePan = false;
     controls.enableZoom = !hero;
     controls.minDistance = 3.4;
@@ -204,18 +203,7 @@ export default function CadScene({
     resize();
 
     let raf = 0;
-    const clock = new THREE.Clock();
     const animate = () => {
-      if (hero) {
-        const time = clock.getElapsedTime();
-        model.position.y = -0.32 + Math.sin(time * 1.15) * 0.06;
-        model.rotation.x = -0.28 + Math.sin(time * 0.62) * 0.07;
-        model.rotation.y += 0.007;
-        model.rotation.z =
-          Math.sin(time * 0.82) * 0.16 + (project.id === "propeller" ? time * 0.22 : 0);
-      } else {
-        model.rotation.y += 0.0015;
-      }
       controls.update();
       renderer.render(scene, camera);
       raf = requestAnimationFrame(animate);

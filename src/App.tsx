@@ -1,23 +1,19 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
   Bot,
   Box,
   ChevronDown,
-  CircleDot,
   Download,
   FolderOpen,
   Home,
   ImagePlus,
-  LockKeyhole,
-  LogIn,
   Plus,
   Send,
   Settings2,
   Sparkles,
   X,
-  Zap,
 } from "lucide-react";
 import CadScene from "./CadScene";
 import { projects as starterProjects } from "./data";
@@ -71,21 +67,23 @@ function App() {
   const addProject = () => {
     const next: Project = {
       id: `concept-${Date.now()}`,
-      name: "Magnetic Fixture Concept",
-      shortName: "Fixture",
-      kind: "New study",
-      status: "Sketching",
-      prompt: "A magnetic fixture with indexed service handles",
+      name: "Untitled Project",
+      shortName: "Untitled",
+      kind: "Blank canvas",
+      status: "No geometry yet",
+      prompt: "",
       updated: "now",
       color: "#c77c43",
       accent: "#e0c59f",
-      score: 64,
-      parts: 3,
-      dimensions: "120 x 44 x 32 mm",
+      score: 0,
+      parts: 0,
+      dimensions: "No model",
+      isBlank: true,
     };
     setProjects((current) => [next, ...current]);
     setActiveProjectId(next.id);
-    setToast("Project added to dashboard");
+    setView("project");
+    setToast("Blank workspace opened");
     window.setTimeout(() => setToast(""), 2200);
   };
 
@@ -100,20 +98,7 @@ function App() {
   };
 
   if (!signedIn) {
-    return (
-      <>
-        <Landing onSignIn={completeSignIn} />
-        <DemoDock
-          activeView="home"
-          settingsOpen={settingsOpen}
-          onHome={showHome}
-          onProjects={showProjects}
-          onProject={showProject}
-          onSettings={() => setSettingsOpen((current) => !current)}
-        />
-        <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-      </>
-    );
+    return <Landing onSignIn={completeSignIn} />;
   }
 
   return (
@@ -147,6 +132,7 @@ function App() {
                 <span>Showroom</span>
               </div>
             </div>
+            <ViewportTechPanel project={activeProject} />
           </div>
         </section>
 
@@ -169,58 +155,11 @@ function App() {
 }
 
 function BackgroundMotion() {
-  return (
-    <div className="motion-field" aria-hidden="true">
-      {Array.from({ length: 7 }, (_, index) => (
-        <span className={`motion-line line-${index + 1}`} key={index} />
-      ))}
-    </div>
-  );
+  return <div className="motion-field" aria-hidden="true" />;
 }
 
 function Landing({ onSignIn }: { onSignIn: () => void }) {
   const [email, setEmail] = useState("pilot@cadybara.dev");
-  const heroProjects = useMemo(() => starterProjects.slice(0, 1), []);
-  const [heroIndex, setHeroIndex] = useState(0);
-  const [completion, setCompletion] = useState(heroProjects[0].score);
-  const [isCompleting, setIsCompleting] = useState(false);
-  const heroProject = heroProjects[heroIndex];
-
-  useEffect(() => {
-    setCompletion(heroProject.score);
-    setIsCompleting(false);
-  }, [heroProject.id, heroProject.score]);
-
-  useEffect(() => {
-    if (isCompleting) return undefined;
-
-    const timer = window.setInterval(() => {
-      setCompletion((current) => Math.min(100, current + 1));
-    }, 140);
-
-    return () => window.clearInterval(timer);
-  }, [isCompleting]);
-
-  useEffect(() => {
-    if (completion < 100 || isCompleting) return;
-    setIsCompleting(true);
-  }, [completion, isCompleting]);
-
-  useEffect(() => {
-    if (!isCompleting) return undefined;
-
-    const timer = window.setTimeout(() => {
-      if (heroProjects.length === 1) {
-        setCompletion(heroProject.score);
-        setIsCompleting(false);
-        return;
-      }
-
-      setHeroIndex((current) => (current + 1) % heroProjects.length);
-    }, 420);
-
-    return () => window.clearTimeout(timer);
-  }, [heroProject.score, heroProjects.length, isCompleting]);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -230,82 +169,70 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
   return (
     <main className="landing">
       <BackgroundMotion />
+      <div className="landing-motion-rig" aria-hidden="true">
+        <span className="rig-orbit" />
+        <span className="rig-orbit rig-orbit-alt" />
+        <span className="rig-part rig-part-a" />
+        <span className="rig-part rig-part-b" />
+        <span className="rig-part rig-part-c" />
+        <span className="rig-scan" />
+      </div>
       <header className="landing-nav">
         <div className="brand-lockup">
           <img className="brand-mark" src="/cadybara-logo.svg" alt="" />
-          <div>
-            <strong>Cadybara</strong>
-            <span>Generative CAD</span>
-          </div>
+          <strong>Cadybara</strong>
         </div>
         <div className="founders-badge">
-          <Zap size={20} />
+          <img src="/founders-inc-logo.svg" alt="" />
           <span>Backed by Founders Inc.</span>
         </div>
       </header>
 
       <section className="landing-content">
         <div className="hero-copy">
-          <span className="eyebrow">2026 CAD Workspace</span>
           <h1>Cadybara</h1>
-          <p>
-            Speak a part into existence, inspect it in a real workspace, and move from idea to
-            export without losing the thread.
-          </p>
-          <div className="hero-actions">
-            <button className="primary-action" onClick={onSignIn}>
-              <LogIn size={18} />
-              Enter workspace
-            </button>
-          </div>
-          <HeroBuildStage
-            project={heroProject}
-            progress={completion}
-            isCompleting={isCompleting}
-          />
         </div>
 
         <form className="signin-panel" onSubmit={submit}>
-          <span className="eyebrow">Pilot Access</span>
           <h2>Sign in</h2>
           <label>
             <span>Email</span>
             <input value={email} onChange={(event) => setEmail(event.target.value)} />
           </label>
-          <label>
-            <span>Workspace</span>
-            <input defaultValue="Cadybara showroom" />
-          </label>
           <button className="wide-action" type="submit">
             Launch workspace
             <ArrowRight size={18} />
           </button>
-          <div className="signin-row">
-            <LockKeyhole size={16} />
-            <span>Pilot access only</span>
-          </div>
         </form>
       </section>
-
-      <div className="landing-strip">
-        {heroProjects.map((project) => {
-          const isActive = project.id === heroProject.id;
-
-          return (
-            <div
-              className={`landing-chip ${isActive ? "active" : ""} ${
-                isActive && isCompleting ? "is-completing" : ""
-              }`}
-              key={project.id}
-            >
-              <CircleDot size={15} color={project.color} />
-              <span>{project.shortName}</span>
-              <strong>{isActive ? completion : project.score}%</strong>
-            </div>
-          );
-        })}
-      </div>
     </main>
+  );
+}
+
+function ViewportTechPanel({ project }: { project: Project }) {
+  const rows = project.isBlank
+    ? [
+        ["Kernel", "Ready"],
+        ["Units", "mm"],
+        ["History", "0 ops"],
+        ["Geometry", "Empty"],
+      ]
+    : [
+        ["Kernel", "CAD mock"],
+        ["Units", "mm"],
+        ["History", `${project.parts} ops`],
+        ["Envelope", project.dimensions],
+      ];
+
+  return (
+    <div className="viewport-tech" aria-label="Model technical summary">
+      {rows.map(([label, value]) => (
+        <div key={label}>
+          <span>{label}</span>
+          <strong>{value}</strong>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -390,38 +317,6 @@ function SettingsSheet({ open, onClose }: { open: boolean; onClose: () => void }
   );
 }
 
-function HeroBuildStage({
-  project,
-  progress,
-  isCompleting,
-}: {
-  project: Project;
-  progress: number;
-  isCompleting: boolean;
-}) {
-  return (
-    <div
-      className={`hero-build-stage ${isCompleting ? "is-completing" : ""}`}
-      aria-label="Live Cadybara project preview"
-    >
-      <div className="build-stage-top">
-        <span>{project.kind}</span>
-        <strong>{project.name}</strong>
-        <b>{progress}%</b>
-      </div>
-      <div className="build-stage-canvas">
-        <CadScene project={project} hero />
-        <div className="build-scan" />
-        <div className="build-readout">
-          <span>Prompt parsed</span>
-          <span>Geometry pass</span>
-          <span>Export check</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function AppHeader({
   view,
   onBack,
@@ -487,16 +382,22 @@ function Dashboard({
               onClick={() => onOpenProject(project.id)}
               title={`Open ${project.name}`}
             >
-              <span className="project-model-preview" aria-hidden="true">
-                <CadScene project={project} hero />
-              </span>
+              {project.isBlank ? (
+                <span className="project-model-preview empty-preview" aria-hidden="true">
+                  <b>No geometry</b>
+                </span>
+              ) : (
+                <span className="project-model-preview" aria-hidden="true">
+                  <CadScene project={project} hero />
+                </span>
+              )}
               <span className="project-tile-top">
                 <span className="project-dot" style={{ background: project.color }} />
                 <small>{project.kind}</small>
                 <b>{project.updated}</b>
               </span>
               <strong>{project.name}</strong>
-              <p>{project.prompt}</p>
+              <p>{project.prompt || "Blank workspace. Add a prompt to generate the first model."}</p>
               <span className="project-tile-foot">
                 <span>{project.status}</span>
                 <b>{project.dimensions}</b>
@@ -529,7 +430,7 @@ function AssistantPanel({
     {
       id: 1,
       role: "assistant",
-      text: "Send a part change, material note, or manufacturability constraint.",
+      text: "Describe the part, material, tolerances, or manufacturing constraints.",
     },
   ]);
   const [busy, setBusy] = useState(false);
@@ -580,8 +481,8 @@ function AssistantPanel({
       </div>
 
       <div className="agent-summary">
-        <span>Current prompt</span>
-        <p>{project.prompt}</p>
+        <span>{project.prompt ? "Current prompt" : "Prompt"}</span>
+        <p>{project.prompt || "No prompt yet. This project is blank."}</p>
       </div>
 
       <div className="message-list">

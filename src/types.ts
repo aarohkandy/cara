@@ -11,6 +11,7 @@ export type Project = {
   score: number;
   parts: number;
   dimensions: string;
+  isBlank?: boolean;
 };
 
 export type ChatMessage = {
