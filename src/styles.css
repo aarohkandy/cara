@@ -81,6 +81,18 @@ button {
   animation: grid-drift 18s linear infinite;
 }
 
+.landing::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 92px;
+  right: 34px;
+  bottom: 36px;
+  left: 34px;
+  border: 1px solid rgba(224, 197, 159, 0.08);
+  pointer-events: none;
+}
+
 .motion-field {
   position: fixed;
   z-index: 0;
@@ -131,7 +143,7 @@ button {
 }
 
 .landing-nav {
-  padding: 28px 32px 0;
+  padding: 28px clamp(18px, 3vw, 36px) 0;
 }
 
 .brand-lockup,
@@ -194,6 +206,24 @@ button {
   fill: currentColor;
 }
 
+.landing-showpiece {
+  position: absolute;
+  z-index: 2;
+  top: 70px;
+  right: 29vw;
+  bottom: 42px;
+  left: 12vw;
+  min-width: 420px;
+  opacity: 0.98;
+  pointer-events: none;
+}
+
+.landing-showpiece canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .landing-stage {
   position: absolute;
   z-index: 2;
@@ -202,7 +232,8 @@ button {
   width: min(500px, 42vw);
   height: min(480px, 58vh);
   pointer-events: none;
-  transform: translateX(-50%) rotate(-8deg);
+  transform: translateX(-50%) translate3d(var(--pointer-x), var(--pointer-y), 0) rotate(-8deg);
+  transition: transform 160ms ease-out;
 }
 
 .stage-ring,
@@ -247,6 +278,37 @@ button {
   width: 1px;
   height: 84%;
   transform: rotate(-8deg);
+}
+
+.stage-measure {
+  border-color: rgba(224, 197, 159, 0.36);
+}
+
+.stage-measure::before,
+.stage-measure::after {
+  content: "";
+  position: absolute;
+  background: rgba(224, 197, 159, 0.36);
+}
+
+.stage-measure-a {
+  top: 28%;
+  left: 18%;
+  width: 45%;
+  height: 28%;
+  border-top: 1px solid;
+  border-left: 1px solid;
+  animation: measure-a 5.8s ease-in-out infinite;
+}
+
+.stage-measure-b {
+  right: 12%;
+  bottom: 20%;
+  width: 34%;
+  height: 22%;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  animation: measure-b 5.8s ease-in-out infinite;
 }
 
 .stage-part {
@@ -518,18 +580,20 @@ button {
 
 .landing-content {
   position: relative;
-  z-index: 3;
+  z-index: 4;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 420px;
-  gap: clamp(32px, 8vw, 120px);
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+  gap: clamp(28px, 6vw, 96px);
   align-items: center;
   min-height: calc(100vh - 84px);
-  padding: 30px clamp(24px, 4vw, 72px) 92px;
+  padding: 24px clamp(18px, 4vw, 72px) 92px;
 }
 
 .hero-copy {
-  max-width: 620px;
+  width: min(56vw, 740px);
+  max-width: 100%;
   min-width: 0;
+  align-self: center;
 }
 
 .eyebrow {
@@ -542,10 +606,18 @@ button {
 
 .hero-copy h1 {
   position: relative;
-  margin: 0 0 22px;
+  margin: 0;
   font-family: Newsreader, Georgia, serif;
-  font-size: clamp(82px, 9.4vw, 138px);
+  font-size: clamp(58px, 9vw, 160px);
   line-height: 0.78;
+  color: #fff4e6;
+  white-space: nowrap;
+}
+
+.hero-wordmark span {
+  display: inline-block;
+  animation: letter-breathe 5.8s ease-in-out infinite;
+  animation-delay: calc(var(--letter-index) * 90ms);
 }
 
 .hero-copy h1::after {
@@ -567,7 +639,7 @@ button {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  width: min(520px, 100%);
+  width: min(560px, 100%);
   min-height: 54px;
   padding: 0 15px;
   border: 1px solid rgba(224, 197, 159, 0.26);
@@ -840,11 +912,12 @@ button {
 .signin-panel {
   position: relative;
   min-width: 0;
-  padding: 26px;
+  align-self: center;
+  padding: 24px;
   border: 1px solid rgba(224, 197, 159, 0.28);
   border-radius: 8px;
-  background: rgba(13, 9, 6, 0.84);
-  backdrop-filter: blur(22px);
+  background: rgba(13, 9, 6, 0.7);
+  backdrop-filter: blur(10px);
 }
 
 .signin-panel::before {
@@ -869,8 +942,8 @@ button {
 }
 
 .signin-panel h2 {
-  margin: 4px 0 22px;
-  font-size: 48px;
+  margin: 2px 0 22px;
+  font-size: clamp(38px, 4.4vw, 52px);
   line-height: 0.95;
 }
 
@@ -1690,6 +1763,34 @@ button {
   }
 }
 
+@keyframes measure-a {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: translate3d(-12px, 8px, 0);
+  }
+
+  45%,
+  72% {
+    opacity: 0.8;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes measure-b {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: translate3d(14px, -8px, 0);
+  }
+
+  45%,
+  72% {
+    opacity: 0.74;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @keyframes command-live {
   0% {
     left: 0;
@@ -1704,6 +1805,17 @@ button {
   100% {
     left: 82%;
     width: 18%;
+  }
+}
+
+@keyframes letter-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  45% {
+    transform: translateY(-5px);
   }
 }
 
@@ -1800,6 +1912,12 @@ button {
 }
 
 @media (max-width: 1020px) {
+  .landing-showpiece {
+    right: 24vw;
+    left: 10vw;
+    min-width: 360px;
+  }
+
   .landing-content {
     grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
     gap: 28px;
@@ -1849,6 +1967,22 @@ button {
     padding: 72px 16px 150px;
   }
 
+  .landing::after {
+    top: 72px;
+    right: 12px;
+    bottom: 56px;
+    left: 12px;
+  }
+
+  .landing-showpiece {
+    top: 78px;
+    right: -2vw;
+    bottom: 255px;
+    left: 28vw;
+    min-width: 340px;
+    opacity: 0.58;
+  }
+
   .landing-drafting-frame {
     inset: 84px 12px 62px;
   }
@@ -1871,7 +2005,11 @@ button {
   }
 
   .hero-copy h1 {
-    font-size: 72px;
+    font-size: clamp(58px, 13vw, 92px);
+  }
+
+  .hero-copy {
+    width: min(92vw, 640px);
   }
 
   .hero-activity {
@@ -1985,24 +2123,7 @@ button {
   }
 
   .founders-badge {
-    display: inline-flex;
-    width: 46px;
-    min-height: 42px;
-    padding: 0;
-  }
-
-  .founders-badge span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  .founders-mark {
-    width: 28px;
-    height: 28px;
+    display: none;
   }
 
   .landing-motion-rig {
@@ -2012,8 +2133,17 @@ button {
     opacity: 0.22;
   }
 
+  .landing-showpiece {
+    top: 84px;
+    right: -34vw;
+    bottom: 310px;
+    left: 16vw;
+    min-width: 300px;
+    opacity: 0.42;
+  }
+
   .hero-copy h1 {
-    font-size: 54px;
+    font-size: clamp(48px, 15vw, 68px);
   }
 
   .landing-stage {

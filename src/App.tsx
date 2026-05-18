@@ -1,4 +1,5 @@
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 import CadScene from "./CadScene";
 import { projects as starterProjects } from "./data";
+import LandingShowpiece from "./LandingShowpiece";
 import type { ChatMessage, Project } from "./types";
 
 function App() {
@@ -169,16 +171,7 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
   return (
     <main className="landing">
       <BackgroundMotion />
-      <div className="landing-stage" aria-hidden="true">
-        <span className="stage-ring stage-ring-outer" />
-        <span className="stage-ring stage-ring-inner" />
-        <span className="stage-axis stage-axis-x" />
-        <span className="stage-axis stage-axis-y" />
-        <span className="stage-part stage-part-base" />
-        <span className="stage-part stage-part-jaw" />
-        <span className="stage-part stage-part-pin" />
-        <span className="stage-cursor" />
-      </div>
+      <LandingShowpiece />
       <header className="landing-nav">
         <div className="brand-lockup">
           <img className="brand-mark" src="/cadybara-logo.svg" alt="" />
@@ -192,17 +185,17 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
 
       <section className="landing-content">
         <div className="hero-copy">
-          <h1>Cadybara</h1>
-          <div className="hero-command" aria-label="Example CAD prompt">
-            <span>Live prompt</span>
-            <strong>clamp bracket with indexed service tabs</strong>
-            <i />
-          </div>
-          <div className="hero-activity" aria-label="Build activity">
-            <span>Parsing</span>
-            <span>Sketching</span>
-            <span>Solidifying</span>
-          </div>
+          <h1 className="hero-wordmark" aria-label="Cadybara">
+            {"Cadybara".split("").map((letter, index) => (
+              <span
+                style={{ "--letter-index": index } as CSSProperties}
+                aria-hidden="true"
+                key={`${letter}-${index}`}
+              >
+                {letter}
+              </span>
+            ))}
+          </h1>
         </div>
 
         <form className="signin-panel" onSubmit={submit}>
