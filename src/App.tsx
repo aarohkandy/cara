@@ -191,6 +191,25 @@ function Landing({ onSignIn }: { onSignIn: () => void }) {
       <section className="landing-content">
         <div className="hero-copy">
           <h1>Cadybara</h1>
+          <div className="hero-command" aria-label="Example CAD prompt">
+            <span>Prompt</span>
+            <strong>compact clamp bracket with service tabs</strong>
+            <i />
+          </div>
+          <div className="hero-readout" aria-label="Workspace capabilities">
+            <span>
+              <b>01</b>
+              Plain language
+            </span>
+            <span>
+              <b>02</b>
+              Live geometry
+            </span>
+            <span>
+              <b>03</b>
+              STEP export
+            </span>
+          </div>
         </div>
 
         <form className="signin-panel" onSubmit={submit}>
