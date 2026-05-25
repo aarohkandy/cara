@@ -1,535 +1,136 @@
-import { useMemo, useState } from "react";
-import type { FormEvent } from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Bot,
-  Box,
-  ChevronDown,
-  Download,
-  FolderOpen,
-  Home,
-  ImagePlus,
-  Plus,
-  Send,
-  Settings2,
-  Sparkles,
-  X,
-} from "lucide-react";
-import CadScene from "./CadScene";
-import { projects as starterProjects } from "./data";
-import LandingShowpiece from "./LandingShowpiece";
-import type { ChatMessage, Project } from "./types";
+import { useState } from "react";
+
+const projects = [
+  "Wall Planter",
+  "Desk Bracket",
+  "Sensor Enclosure",
+  "Ergonomic Handle",
+  "Drone Mount",
+  "Tool Organizer",
+  "Desk Lamp Clamp",
+  "Assembly Jig",
+  "New Project",
+];
 
 function App() {
   const [signedIn, setSignedIn] = useState(() => {
-    return localStorage.getItem("cadybara:signed-in") === "true";
+    return window.localStorage.getItem("cadybara-site-session") === "true";
   });
-  const [projects, setProjects] = useState<Project[]>(starterProjects);
-  const [activeProjectId, setActiveProjectId] = useState(starterProjects[0].id);
-  const [view, setView] = useState<"dashboard" | "project">("dashboard");
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [toast, setToast] = useState("");
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"signin" | "register">("signin");
+  const [selectedProject, setSelectedProject] = useState("");
 
-  const activeProject = useMemo(
-    () => projects.find((project) => project.id === activeProjectId) ?? projects[0],
-    [activeProjectId, projects],
-  );
+  const openAuth = (mode: "signin" | "register") => {
+    if (signedIn) {
+      setSignedIn(false);
+      window.localStorage.removeItem("cadybara-site-session");
+      return;
+    }
 
-  const completeSignIn = () => {
-    localStorage.setItem("cadybara:signed-in", "true");
+    setAuthMode(mode);
+    setAuthOpen(true);
+  };
+
+  const completeAuth = () => {
+    window.localStorage.setItem("cadybara-site-session", "true");
     setSignedIn(true);
-    setView("dashboard");
+    setAuthOpen(false);
   };
 
-  const showHome = () => {
-    localStorage.removeItem("cadybara:signed-in");
-    setSignedIn(false);
-    setView("dashboard");
-  };
+  if (signedIn) {
+    return (
+      <main className="dashboard" aria-label="Cadybara project dashboard">
+        <nav className="top-bar" aria-label="Primary">
+          <button className="brand-word" type="button" onClick={() => setSelectedProject("")}>
+            CADYBARA
+          </button>
+          <div className="nav-actions">
+            <button className="nav-action primary-action" type="button" onClick={() => setSelectedProject("New Project")}>
+              New project
+            </button>
+            <button className="nav-action" type="button" onClick={() => openAuth("signin")}>
+              Sign out
+            </button>
+          </div>
+        </nav>
 
-  const showProjects = () => {
-    localStorage.setItem("cadybara:signed-in", "true");
-    setSignedIn(true);
-    setView("dashboard");
-  };
-
-  const showProject = () => {
-    localStorage.setItem("cadybara:signed-in", "true");
-    setSignedIn(true);
-    setView("project");
-  };
-
-  const signOut = () => {
-    localStorage.removeItem("cadybara:signed-in");
-    setSignedIn(false);
-    setView("dashboard");
-  };
-
-  const addProject = () => {
-    const next: Project = {
-      id: `concept-${Date.now()}`,
-      name: "Untitled Project",
-      shortName: "Untitled",
-      kind: "Blank canvas",
-      status: "No geometry yet",
-      prompt: "",
-      updated: "now",
-      color: "#c77c43",
-      accent: "#e0c59f",
-      score: 0,
-      parts: 0,
-      dimensions: "No model",
-      isBlank: true,
-    };
-    setProjects((current) => [next, ...current]);
-    setActiveProjectId(next.id);
-    setView("project");
-    setToast("Blank workspace opened");
-    window.setTimeout(() => setToast(""), 2200);
-  };
-
-  const openProject = (projectId: string) => {
-    setActiveProjectId(projectId);
-    setView("project");
-  };
-
-  const exportProject = () => {
-    setToast(`${activeProject.shortName}.step queued`);
-    window.setTimeout(() => setToast(""), 2200);
-  };
-
-  if (!signedIn) {
-    return <Landing onSignIn={completeSignIn} />;
+        <section className="project-picker" aria-label="Projects">
+          {projects.map((project, index) => (
+            <button
+              className={`project-stone stone-${index + 1}${selectedProject === project ? " selected" : ""}`}
+              key={project}
+              type="button"
+              onClick={() => setSelectedProject(project)}
+            >
+              <span>{project}</span>
+            </button>
+          ))}
+        </section>
+      </main>
+    );
   }
 
   return (
-    <div className="app-shell">
-      <BackgroundMotion />
-      <AppHeader
-        view={view}
-        onBack={() => setView("dashboard")}
-        onExport={exportProject}
-        onSignOut={signOut}
-      />
-
-      {view === "dashboard" ? (
-        <Dashboard
-          projects={projects}
-          onOpenProject={openProject}
-          onAddProject={addProject}
-        />
-      ) : (
-        <main className="workspace project-workspace">
-        <section className="studio">
-          <div className="viewport-wrap">
-            <CadScene project={activeProject} />
-            <div className="viewport-hud">
-              <div>
-                <span>{activeProject.kind}</span>
-                <strong>{activeProject.name}</strong>
-              </div>
-              <div className="health-pill">
-                <Sparkles size={16} />
-                <span>Showroom</span>
-              </div>
-            </div>
-            <ViewportTechPanel project={activeProject} />
-          </div>
-        </section>
-
-        <AssistantPanel project={activeProject} onProjectUpdate={setProjects} />
-        </main>
-      )}
-
-      {toast && <div className="toast">{toast}</div>}
-      <DemoDock
-        activeView={view === "dashboard" ? "projects" : "project"}
-        settingsOpen={settingsOpen}
-        onHome={showHome}
-        onProjects={showProjects}
-        onProject={showProject}
-        onSettings={() => setSettingsOpen((current) => !current)}
-      />
-      <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-    </div>
-  );
-}
-
-function BackgroundMotion() {
-  return <div className="motion-field" aria-hidden="true" />;
-}
-
-function Landing({ onSignIn }: { onSignIn: () => void }) {
-  const [email, setEmail] = useState("pilot@cadybara.dev");
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    onSignIn();
-  };
-
-  return (
-    <main className="landing">
-      <BackgroundMotion />
-      <header className="landing-nav">
-        <div className="brand-lockup">
-          <img className="brand-mark" src="/cadybara-logo.svg" alt="" />
-          <strong>Cadybara</strong>
+    <main className="hero" aria-label="Cadybara AI CAD landing page">
+      <nav className="top-bar" aria-label="Primary">
+        <button className="brand-word" type="button">
+          CADYBARA
+        </button>
+        <div className="nav-actions">
+          <button className="nav-action primary-action" type="button" onClick={() => openAuth("signin")}>
+            Start now
+          </button>
+          <button className="nav-action" type="button" onClick={() => openAuth("register")}>
+            Register
+          </button>
         </div>
-        <div className="founders-badge">
-          <FoundersLogo />
-          <span>Backed by Founders Inc.</span>
-        </div>
-      </header>
+      </nav>
 
-      <section className="landing-bay">
-        <div className="bay-stage">
-          <LandingShowpiece />
-          <div className="bay-title">
-            <span>Generative CAD</span>
-            <h1>Cadybara</h1>
-          </div>
-          <div className="bay-status" aria-hidden="true">
-            <span>Prompt</span>
-            <span>Model</span>
-            <span>Export</span>
-          </div>
-          <form className="signin-panel" onSubmit={submit}>
-            <h2>Sign in</h2>
-            <label>
+      <section className="hero-center">
+        <p>your favorite</p>
+        <h1>cad capybaras</h1>
+      </section>
+
+      {authOpen && (
+        <div className="auth-shell" role="presentation">
+          <form className="auth-card" onSubmit={(event) => {
+            event.preventDefault();
+            completeAuth();
+          }}>
+            <button className="dialog-close" type="button" aria-label="Close" onClick={() => setAuthOpen(false)}>
+              x
+            </button>
+            <p className="auth-kicker">{authMode === "register" ? "Register" : "Start now"}</p>
+            <h2>{authMode === "register" ? "Create account" : "Sign in"}</h2>
+            {authMode === "register" && (
+              <label className="field">
+                <span>Name</span>
+                <input autoComplete="name" />
+              </label>
+            )}
+            <label className="field">
               <span>Email</span>
-              <input value={email} onChange={(event) => setEmail(event.target.value)} />
+              <input autoComplete="email" type="email" />
             </label>
-            <button className="wide-action" type="submit">
-              Launch workspace
-              <ArrowRight size={18} />
+            <label className="field">
+              <span>Password</span>
+              <input autoComplete={authMode === "register" ? "new-password" : "current-password"} type="password" />
+            </label>
+            <p className="auth-message">Demo mode is ready. Empty fields are fine for testing.</p>
+            <button className="submit-action" type="submit">
+              {authMode === "register" ? "Create account" : "Sign in"}
+            </button>
+            <button
+              className="swap-action"
+              type="button"
+              onClick={() => setAuthMode(authMode === "register" ? "signin" : "register")}
+            >
+              {authMode === "register" ? "Already have an account? Sign in" : "Need an account? Register"}
             </button>
           </form>
         </div>
-      </section>
+      )}
     </main>
-  );
-}
-
-function FoundersLogo() {
-  return (
-    <svg
-      className="founders-mark"
-      viewBox="0 0 128 128"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M48.6 31.1 95.1 4.3c4.1-2.4 9.2.6 9.2 5.4v17.1c0 3.2-1.7 6.1-4.5 7.7L53.3 61.2a7.3 7.3 0 0 1-7.3 0L33.3 54c-4.8-2.7-4.8-9.6 0-12.4l15.3-10.5Z" />
-      <path d="M29.5 72.7 96.2 34c4.1-2.4 9.2.6 9.2 5.3v16.8c0 3.2-1.7 6.2-4.5 7.8L43.7 97c-2.2 1.3-5 1.3-7.3 0L16.1 85.3c-4.8-2.8-4.8-9.7 0-12.5l13.4-7.8Z" />
-      <path d="M78.6 74.4 111.8 55c4.1-2.4 9.2.6 9.2 5.3v40.2c0 5.6-6.1 9-10.9 6.2L78.4 88.1c-5.3-3.1-5.2-10.6.2-13.7Z" />
-    </svg>
-  );
-}
-
-function ViewportTechPanel({ project }: { project: Project }) {
-  const rows = project.isBlank
-    ? [
-        ["Kernel", "Ready"],
-        ["Units", "mm"],
-        ["History", "0 ops"],
-        ["Geometry", "Empty"],
-      ]
-    : [
-        ["Kernel", "CAD mock"],
-        ["Units", "mm"],
-        ["History", `${project.parts} ops`],
-        ["Envelope", project.dimensions],
-      ];
-
-  return (
-    <div className="viewport-tech" aria-label="Model technical summary">
-      {rows.map(([label, value]) => (
-        <div key={label}>
-          <span>{label}</span>
-          <strong>{value}</strong>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function DemoDock({
-  activeView,
-  settingsOpen,
-  onHome,
-  onProjects,
-  onProject,
-  onSettings,
-}: {
-  activeView: "home" | "projects" | "project";
-  settingsOpen: boolean;
-  onHome: () => void;
-  onProjects: () => void;
-  onProject: () => void;
-  onSettings: () => void;
-}) {
-  return (
-    <nav className="demo-dock" aria-label="Showroom screens">
-      <button
-        aria-label="Home"
-        className={activeView === "home" ? "active" : ""}
-        onClick={onHome}
-      >
-        <Home size={17} />
-        <span>Home</span>
-      </button>
-      <button
-        aria-label="Projects"
-        className={activeView === "projects" ? "active" : ""}
-        onClick={onProjects}
-      >
-        <FolderOpen size={17} />
-        <span>Projects</span>
-      </button>
-      <button
-        aria-label="Project"
-        className={activeView === "project" ? "active" : ""}
-        onClick={onProject}
-      >
-        <Box size={17} />
-        <span>Project</span>
-      </button>
-      <button
-        aria-label="Settings"
-        className={settingsOpen ? "active" : ""}
-        onClick={onSettings}
-      >
-        <Settings2 size={17} />
-        <span>Settings</span>
-      </button>
-    </nav>
-  );
-}
-
-function SettingsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
-  return (
-    <aside className={`settings-sheet ${open ? "open" : ""}`} aria-hidden={!open}>
-      <div className="settings-sheet-top">
-        <div>
-          <span className="eyebrow">Showroom controls</span>
-          <strong>Showroom settings</strong>
-        </div>
-        <button title="Close settings" onClick={onClose}>
-          <X size={18} />
-        </button>
-      </div>
-      <div className="setting-row">
-        <span>Palette</span>
-        <b>Warm clay</b>
-      </div>
-      <div className="setting-row">
-        <span>Board</span>
-        <b>3 columns</b>
-      </div>
-      <div className="setting-row">
-        <span>Motion</span>
-        <b>Active</b>
-      </div>
-    </aside>
-  );
-}
-
-function AppHeader({
-  view,
-  onBack,
-  onExport,
-  onSignOut,
-}: {
-  view: "dashboard" | "project";
-  onBack: () => void;
-  onExport: () => void;
-  onSignOut: () => void;
-}) {
-  const isProjectView = view === "project";
-
-  return (
-    <header className="workspace-header">
-      <div className="brand-button" aria-label="Cadybara">
-        <img className="brand-mark" src="/cadybara-logo.svg" alt="" />
-        <span>Cadybara</span>
-      </div>
-
-      <div className="header-actions">
-        {isProjectView ? (
-          <>
-            <button title="Back to projects" onClick={onBack}>
-              <ArrowLeft size={17} />
-              <span>Projects</span>
-            </button>
-            <button title="Export" onClick={onExport}>
-              <Download size={17} />
-              <span>Export</span>
-            </button>
-          </>
-        ) : null}
-        <button title="Sign out" onClick={onSignOut}>
-          <span>Sign out</span>
-        </button>
-      </div>
-    </header>
-  );
-}
-
-function Dashboard({
-  projects,
-  onOpenProject,
-  onAddProject,
-}: {
-  projects: Project[];
-  onOpenProject: (projectId: string) => void;
-  onAddProject: () => void;
-}) {
-  return (
-    <main className="dashboard">
-      <section className="project-grid-shell">
-        <div className="grid-heading">
-          <h1>Projects</h1>
-        </div>
-
-        <div className="project-grid" aria-label="Projects">
-          {projects.map((project) => (
-            <button
-              key={project.id}
-              className="project-tile project-showcase-tile"
-              onClick={() => onOpenProject(project.id)}
-              title={`Open ${project.name}`}
-            >
-              {project.isBlank ? (
-                <span className="project-model-preview empty-preview" aria-hidden="true">
-                  <b>No geometry</b>
-                </span>
-              ) : (
-                <span className="project-model-preview" aria-hidden="true">
-                  <CadScene project={project} hero />
-                </span>
-              )}
-              <span className="project-tile-top">
-                <span className="project-dot" style={{ background: project.color }} />
-                <small>{project.kind}</small>
-                <b>{project.updated}</b>
-              </span>
-              <strong>{project.name}</strong>
-              <p>{project.prompt || "Blank workspace. Add a prompt to generate the first model."}</p>
-              <span className="project-tile-foot">
-                <span>{project.status}</span>
-                <b>{project.dimensions}</b>
-              </span>
-            </button>
-          ))}
-
-          <button className="project-tile add-project-tile" onClick={onAddProject}>
-            <span className="add-tile-icon">
-              <Plus size={24} />
-            </span>
-            <strong>New project</strong>
-            <small>Blank slate</small>
-          </button>
-        </div>
-      </section>
-    </main>
-  );
-}
-
-function AssistantPanel({
-  project,
-  onProjectUpdate,
-}: {
-  project: Project;
-  onProjectUpdate: React.Dispatch<React.SetStateAction<Project[]>>;
-}) {
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      role: "assistant",
-      text: "Describe the part, material, tolerances, or manufacturing constraints.",
-    },
-  ]);
-  const [busy, setBusy] = useState(false);
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const text = input.trim();
-    if (!text) return;
-    setInput("");
-    setBusy(true);
-    setMessages((current) => [...current, { id: Date.now(), role: "user", text }]);
-
-    window.setTimeout(() => {
-      onProjectUpdate((current) =>
-        current.map((item) =>
-          item.id === project.id
-            ? {
-                ...item,
-                status: "Updated by agent",
-                updated: "now",
-                score: Math.min(99, item.score + 2),
-              }
-            : item,
-        ),
-      );
-      setMessages((current) => [
-        ...current,
-        {
-          id: Date.now() + 1,
-          role: "assistant",
-          text: `Applied to ${project.shortName}: topology cleaned, edges tagged, export score improved.`,
-        },
-      ]);
-      setBusy(false);
-    }, 900);
-  };
-
-  return (
-    <aside className="assistant-panel">
-      <div className="panel-title">
-        <div>
-          <Bot size={18} />
-          <strong>Agent</strong>
-        </div>
-        <button title="Panel settings">
-          <ChevronDown size={18} />
-        </button>
-      </div>
-
-      <div className="agent-summary">
-        <span>{project.prompt ? "Current prompt" : "Prompt"}</span>
-        <p>{project.prompt || "No prompt yet. This project is blank."}</p>
-      </div>
-
-      <div className="message-list">
-        {messages.map((message) => (
-          <div className={`message ${message.role}`} key={message.id}>
-            {message.text}
-          </div>
-        ))}
-        {busy && (
-          <div className="message assistant thinking">
-            <Sparkles size={15} />
-            Drafting geometry
-          </div>
-        )}
-      </div>
-
-      <form className="chat-box" onSubmit={submit}>
-        <input
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          placeholder="Say anything or attach image"
-        />
-        <button type="button" title="Attach image">
-          <ImagePlus size={18} />
-        </button>
-        <button type="submit" title="Send">
-          <Send size={18} />
-        </button>
-      </form>
-    </aside>
   );
 }
 
