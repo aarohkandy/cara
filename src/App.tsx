@@ -16,39 +16,51 @@ function App() {
   const [signedIn, setSignedIn] = useState(() => {
     return window.localStorage.getItem("cadybara-site-session") === "true";
   });
+  const [view, setView] = useState<"landing" | "dashboard">("landing");
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "register">("signin");
   const [selectedProject, setSelectedProject] = useState("");
 
   const openAuth = (mode: "signin" | "register") => {
+    setAuthMode(mode);
+    setAuthOpen(true);
+  };
+
+  const openDashboard = () => {
     if (signedIn) {
-      setSignedIn(false);
-      window.localStorage.removeItem("cadybara-site-session");
+      setView("dashboard");
       return;
     }
 
-    setAuthMode(mode);
-    setAuthOpen(true);
+    openAuth("signin");
   };
 
   const completeAuth = () => {
     window.localStorage.setItem("cadybara-site-session", "true");
     setSignedIn(true);
     setAuthOpen(false);
+    setView("dashboard");
   };
 
-  if (signedIn) {
+  const signOut = () => {
+    window.localStorage.removeItem("cadybara-site-session");
+    setSignedIn(false);
+    setSelectedProject("");
+    setView("landing");
+  };
+
+  if (signedIn && view === "dashboard") {
     return (
       <main className="dashboard" aria-label="Cadybara project dashboard">
         <nav className="top-bar" aria-label="Primary">
-          <button className="brand-word" type="button" onClick={() => setSelectedProject("")}>
+          <button className="brand-word" type="button" onClick={() => setView("landing")}>
             CADYBARA
           </button>
           <div className="nav-actions">
             <button className="nav-action primary-action" type="button" onClick={() => setSelectedProject("New Project")}>
               New project
             </button>
-            <button className="nav-action" type="button" onClick={() => openAuth("signin")}>
+            <button className="nav-action" type="button" onClick={signOut}>
               Sign out
             </button>
           </div>
@@ -77,7 +89,7 @@ function App() {
           CADYBARA
         </button>
         <div className="nav-actions">
-          <button className="nav-action primary-action" type="button" onClick={() => openAuth("signin")}>
+          <button className="nav-action primary-action" type="button" onClick={openDashboard}>
             Start now
           </button>
           <button className="nav-action" type="button" onClick={() => openAuth("register")}>
